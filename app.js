@@ -1,6 +1,8 @@
+const form = document.querySelector("form");
 const inputs = document.querySelectorAll(
   "input[type='text'], input[type='password']"
 );
+const progressBar = document.getElementById("progress-bar");
 let pseudo, email, password, confirmPass;
 
 const errorDisplay = (tag, message, valid) => {
@@ -45,48 +47,41 @@ const emailChecker = (value) => {
     email = value;
   }
 };
-
-// const pseudoChecker = (value) => {
-//   const pseudoContainer = document.querySelector(".pseudo-container");
-//   const errorDisplay = document.querySelector(".pseudo-container > span");
-
-//   if ((value.length > 0 && value.length <= 3) || value.length > 20) {
-//     pseudoContainer.classList.add("error");
-//     errorDisplay.textContent = "le pseudo doit faire entre 3 et 20 caractères";
-//   } else if (!value.match(/^[a-zA-Z0-9_.-]*$/)) {
-//     pseudoContainer.classList.add("error");
-//     errorDisplay.textContent =
-//       "Le pseudo ne doit pas contenir de caractères spéciaux";
-//   } else {
-//     pseudoContainer.classList.remove("error");
-//     errorDisplay.textContent = "";
-//   }
-// };
-
-// const emailChecker = (value) => {
-//   const emailContainer = document.querySelector(".email-container");
-//   const errorDisplay = document.querySelector(".email-container > span");
-
-//   if (value.length > 5) {
-//     if (!value.match(/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/)) {
-//       emailContainer.classList.add("error");
-//     } else {
-//       emailContainer.classList.remove("error");
-//     }
-//   } else {
-//     emailContainer.classList.remove("error");
-//   }
-// };
-
 const passwordChecker = (value) => {
-  const passwordContainer = document.querySelector(".password-container");
-  const errorDisplay = document.querySelector(".password-container > span");
+  progressBar.classList = "";
 
-  console.log(passwordContainer, errorDisplay);
+  if (
+    !value.match(
+      /^(?=.*?[A-Z])(?=(.*[a-z]){1,})(?=(.*[\d]){1,})(?=(.*[\W]){1,})(?!.*\s).{8,}$/
+    )
+  ) {
+    errorDisplay(
+      "password",
+      "min de 8 caractères, 1 majuscule, 1 chiffre et un caractère spécial"
+    );
+    progressBar.classList.add("progressRed");
+    password = null;
+  } else if (value.length < 12) {
+    progressBar.classList.add("progressBlue");
+    errorDisplay("password", "", true);
+    password = value;
+  } else {
+    progressBar.classList.add("progressGreen");
+    errorDisplay("password", "", true);
+    password = value;
+  }
+
+  if (confirmPass) confirmChecker(confirmPass);
 };
 
 const confirmChecker = (value) => {
-  console.log(value);
+  if (password !== value) {
+    errorDisplay("confirm", "Les mots de passe ne correspondent pas");
+    confirmPass = false;
+  } else {
+    errorDisplay("confirm", "", true);
+    confirmPass = true;
+  }
 };
 
 inputs.forEach((input) => {
@@ -109,3 +104,27 @@ inputs.forEach((input) => {
     }
   });
 });
+
+form.addEventListener("submit", (e) => {
+  e.preventDefault();
+  console.log("test");
+
+  if (pseudo && email && password && confirmPass) {
+    const data = {
+      pseudo: pseudo,
+      email: email,
+      password: password,
+    };
+    inputs.forEach((input) => (input.value = ""));
+    progressBar.classList = "";
+
+    alert("inscription validée");
+    pseudo = null;
+    email = null;
+    password = null;
+    confirmPass = null;
+  } else {
+    alert("Veuillez remplir correctement les champs");
+  }
+});
+
